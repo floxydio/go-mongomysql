@@ -1,0 +1,36 @@
+services:
+  db:
+    image: mysql:8.4
+    command: --innodb-buffer-pool-size=50M --innodb-log-buffer-size=8M --innodb-flush-log-at-trx-commit=2 --innodb-file-per-table=1 --max-connections=25
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_PASSWORD: reco123!..
+      MYSQL_MAX_CONNECTIONS: 25
+    networks:
+      - web
+
+  phpmyadmin:
+    depends_on:
+      - db
+    image: phpmyadmin:latest
+    ports:
+      - 8080:80
+    restart: always
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: root
+      # PMA_ABSOLUTE_URI: https://floxy.com/database/
+    networks:
+      - web
+
+networks:
+  web:
+
+volumes:
+  db_data:
