@@ -10,8 +10,8 @@ import (
 )
 
 type FeedUserRepository interface {
-	GetFeed() ([]models.UserFeed, error)
-	CreateFeed(feed models.UserFeed) error
+	GetFeed(context context.Context) ([]models.UserFeed, error)
+	CreateFeed(context context.Context, feed models.UserFeed) error
 }
 
 type FeedUserMongoMySQLDB struct {
@@ -26,8 +26,8 @@ func RepositoryFeed(client *mongo.Database, mysqlClients *gorm.DB) FeedUserRepos
 	}
 }
 
-func (r FeedUserMongoMySQLDB) GetFeed() ([]models.UserFeed, error) {
-	data, err := r.mongoClient.Collection("user_feed").Find(context.Background(), bson.M{})
+func (r FeedUserMongoMySQLDB) GetFeed(ctx context.Context) ([]models.UserFeed, error) {
+	data, err := r.mongoClient.Collection("user_feed").Find(ctx, bson.M{})
 	fmt.Println("execute getFeed")
 	if err != nil {
 		return nil, err
@@ -41,8 +41,8 @@ func (r FeedUserMongoMySQLDB) GetFeed() ([]models.UserFeed, error) {
 	return feeds, nil
 }
 
-func (r FeedUserMongoMySQLDB) CreateFeed(form models.UserFeed) error {
-	_, err := r.mongoClient.Collection("user_feed").InsertOne(context.Background(), form)
+func (r FeedUserMongoMySQLDB) CreateFeed(ctx context.Context, form models.UserFeed) error {
+	_, err := r.mongoClient.Collection("user_feed").InsertOne(ctx, form)
 	if err != nil {
 		return err
 	}

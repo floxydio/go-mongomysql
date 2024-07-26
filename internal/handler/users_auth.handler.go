@@ -21,7 +21,7 @@ func UserAuthController(mongoClient *mongo.Database, mysqlClient *gorm.DB) UserA
 func (authService UserAuthRepo) SignUp(c echo.Context) error {
 	var users models.Users
 	if err := c.Bind(&users); err != nil {
-		return c.JSON(400, map[string]interface{}{
+		return c.JSON(400, echo.Map{
 			"status":  400,
 			"error":   true,
 			"message": "Failed to bind data",
@@ -33,7 +33,7 @@ func (authService UserAuthRepo) SignUp(c echo.Context) error {
 		return c.JSON(400, echo.Map{
 			"status":  400,
 			"error":   true,
-			"message": "Something went wrong",
+			"message": err.Error(),
 		})
 	}
 
@@ -47,20 +47,19 @@ func (authService UserAuthRepo) SignUp(c echo.Context) error {
 func (authService UserAuthRepo) SignIn(c echo.Context) error {
 	var userLogin models.UserLogin
 	if err := c.Bind(&userLogin); err != nil {
-		return c.JSON(400, map[string]interface{}{
+		return c.JSON(400, echo.Map{
 			"status":  400,
 			"error":   true,
 			"message": "Failed to bind data",
 		})
 	}
-
 	data, err := authService.userAuthRepo.SignIn(userLogin)
 
 	if err != nil {
 		return c.JSON(400, echo.Map{
 			"status":  400,
 			"error":   true,
-			"message": "Something went wrong",
+			"message": err.Error(),
 		})
 	}
 

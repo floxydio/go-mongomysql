@@ -19,7 +19,7 @@ func FeedUserController(mongoClient *mongo.Database, mysqlClient *gorm.DB) Repos
 }
 
 func (userFeedRepo RepositoryFeedController) FeedUser(c echo.Context) error {
-	data, err := userFeedRepo.repo.GetFeed()
+	data, err := userFeedRepo.repo.GetFeed(c.Request().Context())
 
 	if err != nil {
 		return c.JSON(400, echo.Map{
@@ -40,26 +40,26 @@ func (userFeedRepo RepositoryFeedController) FeedUser(c echo.Context) error {
 func (userFeedRepo RepositoryFeedController) CreateFeed(c echo.Context) error {
 	var feed models.UserFeed
 	if err := c.Bind(&feed); err != nil {
-		return c.JSON(400, map[string]interface{}{
+		return c.JSON(400, echo.Map{
 			"status":  400,
 			"error":   true,
 			"message": "Failed to bind data",
 		})
 	}
 
-	err := userFeedRepo.repo.CreateFeed(feed)
+	err := userFeedRepo.repo.CreateFeed(c.Request().Context(), feed)
 
 	if err != nil {
-		return c.JSON(400, map[string]interface{}{
+		return c.JSON(400, echo.Map{
 			"status":  400,
 			"error":   true,
-			"message": "Something went wrong",
+			"message": err.Error(),
 		})
 	}
 
-	return c.JSON(200, map[string]interface{}{
+	return c.JSON(200, echo.Map{
 		"status":  200,
 		"error":   false,
-		"message": "Something went wrong",
+		"message": "Successfully  Create Feed",
 	})
 }

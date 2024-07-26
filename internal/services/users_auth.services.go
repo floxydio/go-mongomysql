@@ -3,10 +3,12 @@ package services
 import (
 	"errors"
 	"fmt"
+	"github.com/golang-jwt/jwt/v5"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
 	"gonosql/internal/models"
 	"gorm.io/gorm"
+	"time"
 )
 
 type UsersAuthInterface interface {
@@ -44,7 +46,6 @@ func (authService UsersAuthInit) SignIn(form models.UserLogin) (models.ResponseL
 	var user models.Users
 
 	err := authService.mySQLClient.Where("email = ?", form.Email).Find(&user).Error
-
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return models.ResponseLogin{}, fmt.Errorf("user not found")
 	}
@@ -52,10 +53,19 @@ func (authService UsersAuthInit) SignIn(form models.UserLogin) (models.ResponseL
 	if err != nil {
 		return models.ResponseLogin{}, err
 	}
+	signKey := "test_secr37!!"
+	claims := &jwt.MapClaims{
+		"user_id": user.UsersId,
+		"name":    user.Name,
+		"email":   user.Email,
+		"exp":     time.Now().Add(24 * time.Hour).Unix(),
+	}
 
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, _ := token.SignedString([]byte(signKey))
 	errBcrypt := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(form.Password))
-
 	if errBcrypt != nil {
+
 		return models.ResponseLogin{}, fmt.Errorf("%s", "Wrong Username or Password")
 	}
 
@@ -65,6 +75,7 @@ func (authService UsersAuthInit) SignIn(form models.UserLogin) (models.ResponseL
 			UsersId: user.UsersId,
 			Name:    user.Name,
 		},
+		Token:   tokenString,
 		Message: "Successfully Login",
 	}, nil
 

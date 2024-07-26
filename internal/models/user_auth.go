@@ -8,7 +8,7 @@ type Users struct {
 	Email          string    `json:"email" form:"email"`
 	Password       string    `json:"password" form:"password"`
 	DateOfBirth    string    `gorm:"column:date_of_birth" json:"date_of_birth" form:"date_of_birth"`
-	ProfilePicture string    `gorm:"profile_picture" json:"profile_picture" form:"profile_picture"`
+	ProfilePicture string    `gorm:"profile_picture;default:profile.png" json:"profile_picture" form:"profile_picture"`
 	StatusActive   uint      `gorm:"status_active" json:"status_active" form:"status_active"`
 	CreatedAt      time.Time `gorm:"column:created_at" json:"created_at" form:"created_at"`
 }
