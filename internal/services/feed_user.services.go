@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"gonosql/internal/models"
 	"gorm.io/gorm"
@@ -42,6 +43,9 @@ func (r FeedUserMongoMySQLDB) GetFeed(ctx context.Context) ([]models.UserFeed, e
 }
 
 func (r FeedUserMongoMySQLDB) CreateFeed(ctx context.Context, form models.UserFeed) error {
+	if form.Id == "" {
+		form.Id = primitive.NewObjectID().Hex()
+	}
 	_, err := r.mongoClient.Collection("user_feed").InsertOne(ctx, form)
 	if err != nil {
 		return err

@@ -65,7 +65,6 @@ func (authService UsersAuthInit) SignIn(form models.UserLogin) (models.ResponseL
 	tokenString, _ := token.SignedString([]byte(signKey))
 	errBcrypt := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(form.Password))
 	if errBcrypt != nil {
-
 		return models.ResponseLogin{}, fmt.Errorf("%s", "Wrong Username or Password")
 	}
 
